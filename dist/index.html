@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!-- CMPT 315 (Winter 2019)
+     Assign2: Presentation Feedback System (Frontend)
+     
+     Author: Jacinda Shulman -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Feedback System</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <!-- Templates -->
+    <!-- Presenters drop-down menu template -->
+    <script id="presenters-template" type="text/x-dot-template">
+        <select name="presenters">
+            <option value="" selected></option>
+            {{~it :value:index}}
+                    <option value="{{=value.accountID}}">{{=value.firstName}} {{=value.lastName}}</option>
+            {{~}}
+        </select>
+    </script>
+
+    <!--Presentations drop-down menu template -->
+    <script id="presentations-template" type="text/x-dot-template">
+            <select name="presentations">
+                <option value="" selected></option>
+                {{~it :value:index}}
+                    <option value="{{=value.id}}">{{= value.title}}</option>
+                {{~}}
+            </select>
+    </script>
+
+    <!-- Feedback form templates -->
+    <script id="form-title-template" type="text/x-dot-template">
+        <h2>{{=it.title}}</h2>
+        <h3>by {{=it.firstName}} {{=it.lastName}}</h3>        
+    </script>
+    <script id="questions-template" type="text/x-dot-template">
+        {{~it: value:index}}
+        {{=value.qText}}
+        {{?value.qType == "M/C" }}
+        <p id="q{{=value.qID}}"></p>        
+        {{??}}
+        <p id="q{{=value.qID}}"></p>
+        {{?}}
+        <br>
+        {{~}}
+    </script>
+
+    <script id="mc-template" type="text/x-dot-template">
+        <input type="radio" name="{{=it}}" value="0" onclick="submit(this.name, this.value)">0</input>&nbsp&nbsp
+        <input type="radio" name="{{=it}}" value="1" onclick="submit(this.name, this.value)">1</input>&nbsp&nbsp
+        <input type="radio" name="{{=it}}" value="2" onclick="submit(this.name, this.value)">2</input>&nbsp&nbsp
+        <input type="radio" name="{{=it}}" value="3" onclick="submit(this.name, this.value)">3</input>&nbsp&nbsp
+        <input type="radio" name="{{=it}}" value="4" onclick="submit(this.name, this.value)">4</input>
+     </script>
+
+    <script id="open-template" type="text/x-dot-template">
+        <textarea rows="4" cols="50" name="{{=it}}" onblur="submit(this.name, this.value)"></textarea>
+    </script>
+
+
+</head>
+
+<body>
+    <header>
+        <h1>CMPT 315: Presentation Feedback System</h1>
+    </header>
+
+    <!-- Login form -->
+    <section id="login" class="active">
+        <h3>Please provide your individual user token:</h3>
+        <label id="bad-token-message" class="error"></label><br>
+        <input type="text" name="token" class="textbox" maxLength="10" id="token"><br><br>
+        <button type="button" id="login-btn">Log in</button>
+    </section>
+
+    <!-- Main menu -->
+    <section id="main-menu" class="">
+        <!-- Selection drop-down menus -->
+        <div>You are currently logged in as <label id="current-user-name">Jacinda</label>!</div>
+        <div class="flex-container">
+            <div>
+                <h4>Other Presenters:&nbsp<span id="presenters-dropdown"></span></h4>
+            </div>
+            <div>
+                <h4>Other Presentations:&nbsp<span id="presentations-dropdown"></span></h4>
+                <label id="dropdown-message" class="error"></label>
+            </div>
+            <br>
+        </div>
+    </section>
+
+    <section id="feedback-form" class="">
+        <div class="flex-form">
+            <p id="form-header">[Title failed to load]</p>
+            <h4><label id="slot-date"></label>&nbsp;<label id="slot-time"></label></h4>
+            <h4>For M/C questions: 0 (lowest score) to 4 (highest score)</h4>
+            <p id="questions-table">
+                [Table failed to render]
+            </p>
+            <button type="button" id="save-btn">Save & Close</button>
+        </div>
+    </section>
+
+
+    <footer>
+        Last updated: Mar 3 2019<br>
+        Author: Jacinda Shulman
+    </footer>
+
+    <script src="doT.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

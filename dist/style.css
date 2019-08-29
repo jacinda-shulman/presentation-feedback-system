@@ -1,0 +1,128 @@
+/* CMPT 315 (Winter 2019)
+     Assign2: Presentation Feedback System (Frontend)
+     
+     Author: Jacinda Shulman */
+
+body {
+    align-content: center;
+    text-align: center;
+    font-family: helvetica;
+    margin: 30px 30px;   
+}
+
+h1{
+    color: #52527a;
+}
+
+h3{
+    color: #4d4d4d;
+    font-size: 20px;
+}
+
+h4{
+    color: #4d4d4d;
+    font-size: 15px;
+}
+
+
+div {
+    margin: 10px;
+}
+
+
+table{
+    align-content: center;
+    box-sizing: border-box;
+}
+
+select{
+    font-size: 15px;
+}
+
+input.radio{
+    min-width: 80px;
+}
+
+td{
+    min-width: 80px;
+}
+
+th{
+    padding-bottom: 10px;
+    min-width: 80px;
+}
+
+footer {
+    margin-top: 200px;
+    font-size: 12px;
+}
+
+button {
+    font-size: 15px;
+}
+
+textarea {
+    resize: none;
+}
+
+label.error{
+    color:red;
+    font-size: 13px;
+    align-self: center;
+}
+
+.flex-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center, space-between;
+}
+
+.flex-form{
+    border: 2px solid #4d4d4d;
+    padding: 5px 30px;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+    min-width: 500px;    
+}
+
+input.textbox{
+    height: 25px;
+    font-size: 18px;
+}
+
+
+#form-header{
+    color: #52527a;
+}
+
+#loginBox{
+    border: 2px solid #4d4d4d;
+    padding: 5px 30px;
+    height: 175px;
+    width: 500px;
+    min-width: 500px;
+}
+
+#current-user-name{
+    color: #52527a;
+    font-weight: bold;
+}
+
+#main{  
+    border: 2px solid #4d4d4d;
+    padding: 5px 30px;
+    height: 175px;
+    width: 700px;
+    min-width: 500px;
+}
+
+
+section {
+    display: none;
+}
+
+section.active {
+    display: block;
+}

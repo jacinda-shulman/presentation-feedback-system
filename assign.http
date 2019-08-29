@@ -1,0 +1,176 @@
+# -*- restclient -*-
+
+# Assignment1 API documentation and http REST client file
+# Author: Jacinda Shulman 1053874
+#
+
+
+# --------- GENERAL API INFORMATION: ---------
+#
+# AUTHENTICATION:
+#   HTTP Authorization scheme: Bearer realm (RFC 6750)
+#   https://tools.ietf.org/html/rfc6750
+#   Every request to this API requires a valid bearer authentication token
+#   to be included in the Authorization header of the request. 
+#   Response statuses:  200 OK  
+#                       401 Unauthorized - here the server will reply with a challenge
+#                           in the WWW-Authenticate header. Your token is invalid.
+#                       403 Forbidden - the token bearer does not have permission for the resource
+#
+# VERSIONING:
+#   Currently there is only one version of this API. The version is accessed using the URI.
+#   Example:    curl -X GET /api/v1/[resource]
+#
+# FORMATS:
+#   You can request JSON or XML using the Accept header. The default format to a response will be JSON.
+#   Example request:    curl -X GET -H "Accept: application/javascript" /api/v1/questions/ 
+#                       curl -X GET -H "Accept: application/xml" /api/v1/questions/ 
+#
+# PAGINATION, SEARCHING: (I'll implement this when I know how the front end will search)
+#
+#
+# ----------------- RESOURCES: ------------------
+#   Below are the resources available and all possible ways to access them.
+
+# TOKENS
+#   To check if a token exists in the system (and to retrieve the user it belongs to)
+#   Send GET /tokens
+#   Example:
+GET http://localhost:8080/api/v1/tokens
+Authorization: Bearer abcdefg
+
+# QUESTIONS
+#   The question set can be retrived using a GET request to /questions
+#   Example:
+GET http://localhost:8080/api/v1/questions
+Authorization: Bearer aaaa123
+Accept: application/xml
+
+# PRESENTERS
+#   To get a list of presenters, send a GET request to /presenters
+#   Note: the response will include the presenters and their presentation titles
+#   Example:
+GET http://localhost:8080/api/v1/presenters
+Authorization: Bearer aaaa123
+Accept: application/xml
+#
+#   To get a list of presentation titles use /presentations
+GET http://localhost:8080/api/v1/presentations
+Authorization: Bearer aaaa123
+Accept: application/javascript
+
+# FORMS
+#   "Form" stands for "feedback form", for simplicity!
+#
+#   To create a new form, send a POST request to /forms with the target
+#      presenterID in the body. The token will determine the evaulatorID.
+#   Constraints:
+#	- the presenter and the evaluator must not be the same
+#	- unless the first form has been deleted, an evaluator cannot create a
+#	  second form for the same presenter
+#	- the evaluator must have evaluator status and the presenter must have
+#	  presenter status
+#   Response information:
+#       201 Created - The server will respond with the formID and the range of answerIDs
+#	    	      	 allocated for the form
+#	409 Conflict - evaluator has already made a form for this presenter
+#	    		  (formID and list of answerIDs will be returned)
+#	400 Bad Request	- presenterID missing or invalid
+#	    		- presenterID and evaluatorID (from token) are the same
+#	
+#   Example:
+POST http://localhost:8080/api/v1/forms
+Authorization: Bearer aaaa123
+Accept: application/javascript
+4
+#   To clear a form, send DELETE to forms/{formID}/answers
+#   Example (Assuming the POST form above gave back ID #3):
+DELETE http://localhost:8080/api/v1/forms/3/answers
+Authorization: Bearer aaaa123
+#
+#   To delete a form, send DELETE request to the specific formID
+#   Permissions: only the evaluator who created the form can delete it
+#   
+#   Example: (Do the above POST to /forms first to create form 3)
+DELETE http://localhost:8080/api/v1/forms/3
+Authorization: Bearer aaaa123
+
+# ANSWERS
+#   There are two ways to submit an answer to a question on a given form...
+#   Note: PUT is always used; POST is not needed because the answers are 
+#       created with empty values when the form is created.
+#   
+#   Authorization:  Only the evaluator of the form can post to their forms
+#   Submitting answers: 
+#       Use the body of the request to list the integer (for M/C) or the text
+#       of the response.
+#    
+#   If you know the answerID (given when the form is created or pulled),
+#   Send a PUT request to answers/{answerID}
+#   Permissions: only the user who created the form can change the answers on it
+#   Example: submitting or updating the answer to answerID 1... (a text-response question)
+PUT http://localhost:8080/api/v1/answers/11
+Authorization: Bearer 0000111
+I think that Alice did a great presentation.
+#
+#   Or, you can send a PUT request to forms/{formID}/questions/{questionID}
+#   Example: posting an answer to question #7 of form #2... (a M/C question)
+PUT http://localhost:8080/api/v1/forms/2/questions/7
+Authorization: Bearer abcdefg
+2
+#
+#   To get all answers to an existing feedback form, 
+#   send a GET request to /forms/{formID}/answers.
+#   Example:
+GET http://localhost:8080/api/v1/forms/1/answers
+Authorization: Bearer aaaa123
+Accept: application/xml
+
+
+# --- Examples of bad requests ---
+#
+# POST to /questions,
+# Response: 405 method not allowed;
+POST http://localhost:8080/api/v1/questions
+Authorization: Bearer aaaa123
+
+# No token provided (or the 'Bearer' piece omitted)
+# Response: 401 Unauthorized
+#   Www-Authenticate: [challenge]
+GET http://localhost:8080/api/v1/questions
+
+# Bad token provided
+# Response: 401 Unauthorized
+#    Www-Authenticate: [challenge], [error type], [error message]
+GET http://localhost:8080/api/v1/presenters
+Authorization: Bearer baDToKEn
+
+# Post a new form that already exists 
+# (your token and the presenterID already have a form in the system)
+# Response: 409 Conflict
+#   - Returns the relevant form and the list of answerIDs
+POST http://localhost:8080/api/v1/forms
+Authorization: Bearer 0000111
+Accept: application/javascript
+3
+# Delete or clear a form you didn't create
+# Response: 403 Forbidden
+DELETE http://localhost:8080/api/v1/forms/1
+Authorization: Bearer aaaa123
+
+# Edit a form you didn't create
+# Response: 403 Forbidden
+PUT http://localhost:8080/api/v1/answers/11
+Authorization: Bearer abcdefg
+Hehe I'm messing with this answer
+
+# Edit a non-existent form 
+# Response: 400 Bad Request
+PUT http://localhost:8080/api/v1/forms/250321/questions/7
+Authorization: Bearer abcdefg
+2
+
+# Edit an answer with no response body
+# Response: 400 Bad Request
+PUT http://localhost:8080/api/v1/answers/11
+Authorization: Bearer 0000111
