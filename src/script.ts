@@ -1,8 +1,8 @@
 /* CMPT 315 (Winter 2019)
-    Assign2: Presentation Feedback System (Frontend)
+    Assign2: Presentation Feedback System (Front-end)
      
     Author: Jacinda Shulman 
-    Sources: Cod examples by Nicholas Boers 
+    Sources: Code examples by Nicholas Boers 
             - The render functions were modified from code from lab05 
             - XMLHTTPRequests were modified from source code example redux
                 (Assessments Application)
@@ -64,7 +64,6 @@ interface WrappedForm {
     answerIDs: Array<number>;
 }
 
-
 let submit = (answerID: string, value: string): void => {
     let req = new XMLHttpRequest();
     req.onload = (evt: Event): void => {
@@ -75,6 +74,7 @@ let submit = (answerID: string, value: string): void => {
             console.log("error message from server:", req.status);
         }
     }
+    
     req.open("PUT", `http://localhost:8080/api/v1/answers/${answerID}`);
     req.setRequestHeader("Authorization", "Bearer " + token);
     req.send(value);
@@ -102,22 +102,24 @@ let getPresentation = (id: number): Presentation | null => {
     }
     return null;
 }
+
 // renderQuestionSet uses the QuestionSet object to populate  
 //  and render the dropdown list in the HTML
 let renderQuestionSet = (): void => {
-    console.log("rendering questions...")
     // obtain the form template
     let tmpl = <HTMLElement>document.querySelector("#questions-template");
     if (!tmpl || !tmpl.textContent) {
         console.log("error selecting template");
         return;
     }
+    
     // obtain the target for the questions-table
     let target = <HTMLElement>document.querySelector("#questions-table");
     if (!target) {
         console.log("error selecting #questions-table");
         return;
     }
+    
     // render the template and copy the result into the DOM
     let renderQuestions = doT.template(tmpl.textContent);
     target.innerHTML = renderQuestions(questions);
@@ -126,7 +128,6 @@ let renderQuestionSet = (): void => {
 // getQuestions sends the request to the server to get the list of
 // questions, then calls the render functions to create the form questions in HTML
 let getQuestions = (): void => {
-    console.log("getQuestions");
     let req = new XMLHttpRequest();
     req.onload = (evt: Event): void => {
         // if error, display message
@@ -147,6 +148,7 @@ let getQuestions = (): void => {
         return;
     }
     let authString = "Bearer " + token;
+    
     req.open("GET", `http://localhost:8080/api/v1/questions`);
     req.setRequestHeader("Authorization", authString);
     req.send();
@@ -165,8 +167,6 @@ let checkAnswers = (): void => {
             console.log(`error selecting #q${answers[i].qID}`);
             return;
         }
-        //console.log(`selected #q${answers[i].qID}`);
-        //console.log(`answer should be set to ${answers[i].answerValue}`)
 
         // Populate previous answers to the questions
         if (answers[i].qID == 11 || answers[i].qID == 12) {
@@ -193,7 +193,6 @@ let checkAnswers = (): void => {
     }
 }
 
-
 let renderAnswers = (answerIDs: Array<number>): void => {
     console.log("renderAnswers...");
     let i = 0;
@@ -204,6 +203,7 @@ let renderAnswers = (answerIDs: Array<number>): void => {
             console.log(`error selecting #q${i + 1}`);
             return;
         }
+        
         // render the template and copy the result into the DOM
         if (questions[i].qType == "M/C") {
             target.innerHTML = renderMC(answerIDs[i]);
@@ -240,7 +240,7 @@ let getAnswers = (data: WrappedForm): void => {
     }
     let authString = "Bearer " + token;
     let URI = `http://localhost:8080/api/v1/forms/${f.formID}/answers`;
-    console.log("URI:", URI);
+
     req.open("GET", URI);
     req.setRequestHeader("Authorization", authString);
     req.send();
@@ -249,7 +249,6 @@ let getAnswers = (data: WrappedForm): void => {
 
 let renderForm = (data: WrappedForm): void => {
     let f = data.form;
-    console.log("rendering form with form ID:", f.formID);
 
     // fill in the title of the presentation
     // only create the render function if it is set to null
@@ -267,9 +266,8 @@ let renderForm = (data: WrappedForm): void => {
         console.log("error selecting #form-header");
         return;
     }
+    
     let pres = getPresentation(f.presenterID);
-    console.log(presentations);
-    console.log(pres);
     let l1 = <HTMLLabelElement>document.querySelector("#slot-date");
     let l2 = <HTMLLabelElement>document.querySelector("#slot-time");
     if (!l1 || !l2) {
@@ -315,17 +313,16 @@ let postForm = (presenterID: number): void => {
             console.log("form already exists");
         }
         currentForm = JSON.parse(req.responseText);
-        console.log(currentForm);
         renderForm(currentForm);
-
     }
+    
     req.open("POST", `http://localhost:8080/api/v1/forms`);
     req.setRequestHeader("Authorization", "Bearer " + token);
     req.send(presenterID.toString());
 }
 
 // addDropdownListeners - when one menu is changed, the other is cleared
-//  and the feedback form is rendered according to the selection
+// and the feedback form is rendered according to the selection
 function addDropdownListeners() {
     let p1 = <HTMLElement>document.querySelector("#presenters-dropdown");
     let p1Menu = <HTMLSelectElement>p1.firstElementChild;
@@ -344,9 +341,8 @@ function addDropdownListeners() {
         };
 }
 
-
 // renderPresentations uses the array of Presentation object to populate  
-//  and render the dropdown list in the HTML
+// and render the dropdown list in the HTML
 function renderPresentations() {
     console.log("rendering presenters...");
 
@@ -370,7 +366,7 @@ function renderPresentations() {
     // add listener if the other menu is already loaded
     if (ready) {
         addDropdownListeners();
-    }// else indicate this one is ready
+    } // else indicate this one is ready
     else {
         ready = true;
     }
@@ -380,6 +376,7 @@ function renderPresentations() {
 // presentations, then calls the render functions to create the dropdown lists in HTML
 function getPresentations() {
     let req = new XMLHttpRequest();
+    
     req.onload = (evt: Event): void => {
         // if error, display message
         if (req.status != 200) {
@@ -393,35 +390,35 @@ function getPresentations() {
             renderPresentations();
         }
     }
+    
     req.onerror = (evt: Event): void => {
         console.log("getPresentations: error connecting to server");
         return;
     }
+    
     let authString = "Bearer " + token;
     req.open("GET", `http://localhost:8080/api/v1/presentations`);
     req.setRequestHeader("Authorization", authString);
     req.send();
 }
 
-
-
 // renderPresenters uses the array of Presenter object to populate  
 //  and render the dropdown list in the HTML
 function renderPresenters() {
-    console.log("rendering presenters...");
-
     // obtain the template from the HTML document
     let tmpl = <HTMLElement>document.querySelector("#presenters-template");
     if (!tmpl || !tmpl.textContent) {
         console.log("error selecting template");
         return;
     }
+    
     // obtain the target in the DOM for the rendered HTML
     let target = <HTMLElement>document.querySelector("#presenters-dropdown");
     if (!target) {
         console.log("error selecting target");
         return;
     }
+    
     // render the template and copy the result into the DOM
     let renderFunc = doT.template(tmpl.textContent);
     target.innerHTML = renderFunc(presenters);
@@ -429,7 +426,7 @@ function renderPresenters() {
     // add listener if the other menu is already loaded
     if (ready) {
         addDropdownListeners();
-    }// else indicate this one is ready
+    } // else indicate this one is ready
     else {
         ready = true;
     }
@@ -445,34 +442,34 @@ function getPresenters() {
             console.log("error status from server:", req.status);
             return;
         }
-        //If successful, populate array
+        // If successful, populate array
         else if (req.status == 200) {
             presenters = JSON.parse(req.responseText);
             console.log(presenters);
             renderPresenters();
         }
-    }
+    }  
     req.onerror = (evt: Event): void => {
         console.log("getPresenters: error connecting to server");
         return;
     }
+    
     let authString = "Bearer " + token;
     req.open("GET", `http://localhost:8080/api/v1/presenters`);
     req.setRequestHeader("Authorization", authString);
     req.send();
 }
 
-
 let loadHomePage = (): void => {
     // hide the log in page and load the elements of the main menu
     let loginPage = <HTMLElement>document.querySelector("#login");
     let mainMenu = <HTMLElement>document.querySelector("#main-menu");
     let displayName = <HTMLLabelElement>document.querySelector("#current-user-name");
+    
     displayName.innerText = authUser.firstName;
     loginPage.className = "";
     mainMenu.className = "active";
 
-    // calls to render the templates for the questions and dropdowns
     getQuestions();
     getPresenters();
     getPresentations();
@@ -485,14 +482,14 @@ let authenthicate = (inputToken: string): void => {
 
     let req = new XMLHttpRequest();
     req.onload = (evt: Event): void => {
-        // if unauthorized, display message
+        // If unauthorized, display message
         if (req.status == 401) {
             console.log("authenticate function got 401 back from server");
             let badTokenMessage = <HTMLLabelElement>document.querySelector("#bad-token-message");
             badTokenMessage.innerText = "*Invalid token provided";
             return;
         }
-        //If authentication successful, load home page
+        // If authentication successful, load home page
         else if (req.status == 200) {
             authUser = JSON.parse(req.responseText);
             console.log(authUser);
@@ -504,6 +501,7 @@ let authenthicate = (inputToken: string): void => {
         console.log("Error connecting to server");
         return;
     }
+   
     let authString = "Bearer " + inputToken;
     req.open("GET", `http://localhost:8080/api/v1/tokens`);
     req.setRequestHeader("Authorization", authString);
@@ -514,11 +512,13 @@ let processLogIn = (): void => {
     // If input is empty, display message
     let badTokenMessage = <HTMLLabelElement>document.querySelector("#bad-token-message");
     let input = (document.querySelector("#token") as HTMLInputElement).value;
+    
     if (input == null || input === "") {
         badTokenMessage.innerText = "*Please enter a valid token";
         console.log("Input field was was blank");
         return;
     }
+    
     authenthicate(input);
 }
 
@@ -541,12 +541,10 @@ window.onload = (): void => {
     }
     renderMC = doT.template(tmpl.textContent);
 
-
     let tmpl2 = <HTMLElement>document.querySelector("#open-template");
     if (!tmpl2 || !tmpl2.textContent) {
         console.log("error selecting form title template");
         return;
     }
     renderOpen = doT.template(tmpl2.textContent);
-
 }
